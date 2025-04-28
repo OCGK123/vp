@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공블몬 서버 | Cobblemon & Create</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 폰트 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        
+        :root {
+            /* 기본 컬러 팔레트 (iOS 스타일) */
+            --primary: #000000;
+            --secondary: #141414;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --warning: #FF9500;
+            --info: #2e2e2e;
+            --light: #F2F2F7;
+            --dark: #1C1C1E;
+            --black: #000000;
+            --white: #FFFFFF;
+            --gray-1: #8E8E93;
+            --gray-2: #C7C7CC;
+            --gray-3: #D1D1D6;
+            --gray-4: #E5E5EA;
+            --gray-5: #F2F2F7;
+            --gray-6: #F9F9F9;
+            
+            --cobblemon: #FF3B30;
+            --create: #FF9500;
+            --optimized: #0f0f0f;
+            
+            /* 애니메이션 속도 */
+            --anim-speed-fast: 0.15s;
+            --anim-speed-normal: 0.3s;
+            --anim-speed-slow: 0.5s;
+            
+            /* 둥근 모서리 */
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 20px;
+            --radius-full: 9999px;
+            
+            /* 그림자 */
+            --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-large: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark);
+            line-height: 1.5;
+            overflow-x: hidden;
+            transition: background-color var(--anim-speed-normal) ease;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            z-index: 100;
+            transition: all var(--anim-speed-normal) cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 max(calc((100% - 1200px) / 2), 24px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode .navbar {
+            background-color: rgba(28, 28, 30, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .navbar-scrolled {
+            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
+            height: 60px;
+        }
+
+        body.dark-mode .navbar-scrolled {
+            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* 로고 스타일 */
+        .logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform var(--anim-speed-fast) ease, opacity var(--anim-speed-fast) ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        .logo-image {
+            height: 40px;
+            width: auto;
+            transition: transform var(--anim-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .logo:hover .logo-image {
+            transform: scale(1.1);
+        }
+
+        body.dark-mode .logo {
+            color: var(--white);
+        }
+
+        /* 모바일 메뉴 로고 */
+        .mobile-menu-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .mobile-logo-image {
+            height: 60px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            padding: 6px 2px;
+            transition: color var(--anim-speed-fast) ease;
+        }
+
+        body.dark-mode .nav-link {
+            color: var(--white);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width var(--anim-speed-fast) cubic-bezier(0.65, 0, 0.35, 1);
+            border-radius: var(--radius-full);
+            opacity: 0.8;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-join-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--anim-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-join-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-100%);
+            transition: transform 1s ease;
+        }
+
+        .nav-join-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-join-button:hover::before {
+            transform: translateX(100%);
+        }
+
+        .nav-join-button:active {
+            transform: translateY(0);
+            transition: transform 0.1s;
+        }
+
+        /* 헤더 섹션 */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 100px 24px 0;
+            text-align: center;
+            background-color: var(--white);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeUp 1s ease forwards;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-1);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--anim-speed-fast) ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .server-address-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .server-address {
+            padding: 16px 30px;
+            background-color: var(--gray-6);
+            color: var(--dark);
+            border-radius: var(--radius-full);
+            font-family: monospace;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all var(--anim-speed-fast) ease;
+            cursor: pointer;
+            border: 1px solid var(--gray-4);
+        }
+
+        .server-address:hover {
+            background-color: var(--gray-5);
+        }
+
+        .copy-icon {
+            font-size: 0.9rem;
+            color: var(--gray-1);
+        }
+
+        .server-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--success);
+            margin-top: 10px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .hero-image {
+            border-radius: var(--radius-large);
+            overflow: hidden;
+            height: auto;
+            max-width: 100%;
+            aspect-ratio: 16/9;
+            background-color: var(--gray-5);
+            box-shadow: var(--shadow-large);
+            margin: 30px auto 60px;
+            position: relative;
+            animation: fadeUp 1.2s 0.4s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+
+
+
+        .hero-image:hover::before {
+            transform: scale(1.02);
+            filter: grayscale(0) brightness(1);
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            padding: 100px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: var(--radius-full);
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--gray-1);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* 특징 섹션 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background-color: var(--white);
+            border-radius: var(--radius-large);
+            padding: 40px;
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: var(--shadow-small);
+            border: 1px solid var(--gray-4);
+            z-index: 1;
+        }
+
+        body.dark-mode .feature-card {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--anim-speed-normal) cubic-bezier(0.65, 0, 0.35, 1);
+            z-index: 0;
+        }
+
+        .feature-card.cobblemon::after {
+            background: var(--cobblemon);
+        }
+
+        .feature-card.create::after {
+            background: var(--create);
+        }
+
+        .feature-card.optimization::after {
+            background: var(--optimized);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-large), 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 2.8rem;
+            margin-bottom: 28px;
+            color: var(--primary);
+            background: rgba(0, 122, 255, 0.1);
+            height: 80px;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+
+        .feature-icon.cobblemon {
+            color: var(--cobblemon);
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        .feature-icon.create {
+            color: var(--create);
+            background: rgba(255, 149, 0, 0.1);
+        }
+
+        .feature-icon.optimization {
+            color: var(--optimized);
+            background: rgba(88, 86, 214, 0.1);
+        }
+
+        body.dark-mode .feature-icon {
+            background: rgba(0, 122, 255, 0.15);
+        }
+
+        body.dark-mode .feature-icon.cobblemon {
+            background: rgba(255, 59, 48, 0.15);
+        }
+
+        body.dark-mode .feature-icon.create {
+            background: rgba(255, 149, 0, 0.15);
+        }
+
+        body.dark-mode .feature-icon.optimization {
+            background: rgba(88, 86, 214, 0.15);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--dark);
+            position: relative;
+        }
+
+        body.dark-mode .feature-title {
+            color: var(--white);
+        }
+
+        .feature-description {
+            color: var(--gray-1);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .feature-more {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: auto;
+            padding: 8px 0;
+            position: relative;
+            transition: all var(--anim-speed-fast) ease;
+        }
+
+        .feature-more::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform var(--anim-speed-fast) cubic-bezier(0.65, 0, 0.35, 1);
+            opacity: 0.5;
+        }
+
+        .feature-more:hover {
+            gap: 12px;
+        }
+
+        .feature-more:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .feature-card.cobblemon .feature-more {
+            color: var(--cobblemon);
+        }
+
+        .feature-card.cobblemon .feature-more::after {
+            background-color: var(--cobblemon);
+        }
+
+        .feature-card.create .feature-more {
+            color: var(--create);
+        }
+
+        .feature-card.create .feature-more::after {
+            background-color: var(--create);
+        }
+
+        .feature-card.optimization .feature-more {
+            color: var(--optimized);
+        }
+
+        .feature-card.optimization .feature-more::after {
+            background-color: var(--optimized);
+        }
+
+        /* 모드팩 섹션 */
+        .modpack {
+            position: relative;
+            background-color: var(--gray-6);
+            margin-top: 80px;
+            border-radius: var(--radius-large);
+            overflow: hidden;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid var(--gray-4);
+            box-shadow: var(--shadow-medium);
+            transition: all var(--anim-speed-normal) ease;
+        }
+
+        body.dark-mode .modpack {
+            background-color: rgba(36, 36, 38, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .modpack::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIj48cGF0aCBkPSJNMzYgMzRjMC0yLjItMS44LTQtNC00cy00IDEuOC00IDRjMCAyLjIgMS44IDQgNCA0czQtMS44IDQtNHptMC0yNGMwLTIuMi0xLjgtNC00LTRzLTQgMS44LTQgNGMwIDIuMiAxLjggNCA0IDRzNC0xLjggNC00em0wIDQ4YzAtMi4yLTEuOC00LTQtNHMtNCAxLjgtNCA0YzAgMi4yIDEuOCA0IDQgNHM0LTEuOCA0LTR6Ij48L3BhdGg+PC9nPjwvZz48L3N2Zz4=');
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .modpack > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .modpack-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.dark-mode .modpack-title {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modpack-description {
+            color: var(--gray-1);
+            margin-bottom: 30px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .download-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .download-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background-color: var(--white);
+            padding: 20px 28px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-small);
+            transition: all var(--anim-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            border: 1px solid var(--gray-4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .download-option {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .download-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-100%);
+            transition: transform 1s ease;
+            z-index: 0;
+        }
+
+        .download-option:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-medium), 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-option:hover::before {
+            transform: translateX(100%);
+        }
+
+        .download-option > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .download-icon {
+            font-size: 1.4rem;
+            color: var(--primary);
+            background: rgba(0, 122, 255, 0.1);
+            height: 48px;
+            width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all var(--anim-speed-normal) ease;
+        }
+
+        body.dark-mode .download-icon {
+            background: rgba(0, 122, 255, 0.15);
+        }
+
+        .download-option:hover .download-icon {
+            transform: scale(1.1);
+        }
+
+        .download-info {
+            text-align: left;
+        }
+
+        .download-label {
+            font-size: 0.9rem;
+            color: var(--gray-1);
+            margin-bottom: 4px;
+        }
+
+        .download-version {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.05rem;
+        }
+
+        body.dark-mode .download-version {
+            color: var(--white);
+        }
+
+        /* 모드 섹션 */
+        .mods-filter {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background-color: var(--white);
+            color: var(--gray-1);
+            border: 1px solid var(--gray-4);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--anim-speed-fast) ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-small);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn.cobblemon.active {
+            background-color: var(--cobblemon);
+            border-color: var(--cobblemon);
+        }
+
+        .filter-btn.create.active {
+            background-color: var(--create);
+            border-color: var(--create);
+        }
+
+        .filter-btn.optimization.active {
+            background-color: var(--optimized);
+            border-color: var(--optimized);
+        }
+
+        .mods-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .mod-card {
+            background-color: var(--white);
+            border-radius: var(--radius-medium);
+            padding: 24px;
+            transition: all var(--anim-speed-normal) ease;
+            border: 1px solid var(--gray-4);
+            box-shadow: var(--shadow-small);
+        }
+
+        .mod-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .mod-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .mod-category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .mod-category.cobblemon {
+            background-color: var(--cobblemon);
+        }
+
+        .mod-category.create {
+            background-color: var(--create);
+        }
+
+        .mod-category.optimization {
+            background-color: var(--optimized);
+        }
+
+        .mod-category.gameplay {
+            background-color: var(--primary);
+        }
+
+        .mod-category.visual {
+            background-color: var(--warning);
+        }
+
+        .mod-category.utility {
+            background-color: var(--gray-1);
+        }
+
+        .mod-description {
+            color: var(--gray-1);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* 시스템 요구사항 섹션 */
+        .requirements {
+            background-color: var(--gray-6);
+            border-radius: var(--radius-large);
+            padding: 50px;
+            margin-top: 80px;
+            border: 1px solid var(--gray-4);
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .requirements {
+            background-color: rgba(36, 36, 38, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .requirements::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 122, 255, 0.03) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: 0;
+        }
+
+        .requirements > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .requirements-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.dark-mode .requirements-title {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .requirement-card {
+            background-color: var(--white);
+            border-radius: var(--radius-medium);
+            padding: 30px;
+            box-shadow: var(--shadow-small);
+            border: 1px solid var(--gray-4);
+            display: flex;
+            flex-direction: column;
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .requirement-card {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .requirement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium), 0 15px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .requirement-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .requirement-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            background: rgba(0, 122, 255, 0.1);
+            height: 48px;
+            width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all var(--anim-speed-normal) ease;
+        }
+
+        body.dark-mode .requirement-icon {
+            background: rgba(0, 122, 255, 0.15);
+        }
+
+        .requirement-card:hover .requirement-icon {
+            transform: scale(1.1);
+        }
+
+        .requirement-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        body.dark-mode .requirement-title {
+            color: var(--white);
+        }
+
+        .requirement-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirement-item {
+            padding: 12px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border-bottom: 1px solid var(--gray-5);
+            transition: all var(--anim-speed-fast) ease;
+        }
+
+        body.dark-mode .requirement-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .requirement-item:last-child {
+            border-bottom: none;
+        }
+
+        .requirement-card:hover .requirement-item {
+            padding-left: 5px;
+        }
+
+        .requirement-item i {
+            color: var(--success);
+            margin-top: 4px;
+            transition: transform var(--anim-speed-fast) ease;
+        }
+
+        .requirement-card:hover .requirement-item i {
+            transform: scale(1.2);
+        }
+
+        .requirement-label {
+            font-weight: 600;
+            margin-right: 8px;
+            color: var(--dark);
+        }
+
+        body.dark-mode .requirement-label {
+            color: var(--white);
+        }
+
+        .requirement-value {
+            color: var(--gray-1);
+            line-height: 1.5;
+        }
+
+        /* 시작하기 섹션 */
+        .getting-started {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 50px;
+            position: relative;
+        }
+
+        .getting-started::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            left: 50px;
+            height: calc(100% - 120px);
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            .getting-started::before {
+                display: none;
+            }
+        }
+
+        .step {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            padding: 35px;
+            border-radius: var(--radius-medium);
+            background-color: var(--white);
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--gray-4);
+            box-shadow: var(--shadow-small);
+            position: relative;
+            z-index: 1;
+        }
+
+        body.dark-mode .step {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .step:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-medium), 0 15px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .step:hover .step-number {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark);
+            position: relative;
+            display: inline-block;
+        }
+
+        body.dark-mode .step-title {
+            color: var(--white);
+        }
+
+        .step-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: var(--radius-full);
+            transition: width var(--anim-speed-normal) cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .step:hover .step-title::after {
+            width: 100%;
+        }
+
+        .step-description {
+            color: var(--gray-1);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        /* 단계별 아이콘 추가 */
+        .step:nth-child(1) .step-number::before {
+            content: "\f019"; /* fa-download */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.2;
+        }
+
+        .step:nth-child(2) .step-number::before {
+            content: "\f49e"; /* fa-box-open */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.2;
+        }
+
+        .step:nth-child(3) .step-number::before {
+            content: "\f085"; /* fa-cogs */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.2;
+        }
+
+        .step:nth-child(4) .step-number::before {
+            content: "\f11b"; /* fa-gamepad */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.2;
+        }
+
+        /* 푸터 */
+        footer {
+            background-color: var(--gray-6);
+            padding: 80px 24px 60px;
+            margin-top: 150px;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid var(--gray-4);
+        }
+
+        body.dark-mode footer {
+            background-color: rgba(36, 36, 38, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIj48cGF0aCBkPSJNMzYgMzRjMC0yLjItMS44LTQtNC00cy00IDEuOC00IDRjMCAyLjIgMS44IDQgNCA0czQtMS44IDQtNHptMC0yNGMwLTIuMi0xLjgtNC00LTRzLTQgMS44LTQgNGMwIDIuMiAxLjggNCA0IDRzNC0xLjggNC00em0wIDQ4YzAtMi4yLTEuOC00LTQtNHMtNCAxLjgtNCA0YzAgMi4yIDEuOCA0IDQgNHM0LTEuOCA0LTR6Ij48L3BhdGg+PC9nPjwvZz48L3N2Zz4=');
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--dark);
+            transition: transform var(--anim-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .footer-logo {
+            color: var(--white);
+        }
+
+        .footer-logo:hover {
+            transform: translateY(-2px);
+        }
+
+        a {
+             text-decoration: none;
+        }
+
+
+
+        .footer-logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+            background: rgba(0, 122, 255, 0.1);
+            height: 50px;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .footer-logo i {
+            background: rgba(0, 122, 255, 0.15);
+        }
+
+        .footer-logo:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .footer-navigation {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-link {
+            color: var(--gray-1);
+            text-decoration: none;
+            transition: all var(--anim-speed-fast) ease;
+            padding: 5px 0;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width var(--anim-speed-fast) cubic-bezier(0.65, 0, 0.35, 1);
+            border-radius: var(--radius-full);
+            opacity: 0.8;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        .footer-link:hover::after {
+            width: 100%;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .social-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-1);
+            font-size: 1.4rem;
+            transition: all var(--anim-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-small);
+            border: 1px solid var(--gray-4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .social-icon {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 122, 255, 0.1) 0%, rgba(90, 200, 250, 0.1) 100%);
+            transform: translateY(100%);
+            transition: transform var(--anim-speed-fast) cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px);
+            color: var(--primary);
+            box-shadow: var(--shadow-medium), 0 10px 20px rgba(0, 122, 255, 0.15);
+        }
+
+        .social-icon:hover::before {
+            transform: translateY(0);
+        }
+
+        .footer-social .social-icon:nth-child(1):hover {
+            color: #5865F2; /* Discord */
+        }
+
+        .footer-social .social-icon:nth-child(2):hover {
+            color: #333; /* GitHub */
+        }
+
+        .footer-social .social-icon:nth-child(3):hover {
+            color: #FF0000; /* YouTube */
+        }
+
+        .footer-legal {
+            color: var(--gray-1);
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            opacity: 0.8;
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        /* 알림 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--dark);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-large);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            pointer-events: none;
+            opacity: 0;
+            transition: transform var(--anim-speed-normal) ease, opacity var(--anim-speed-normal) ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            color: var(--success);
+        }
+
+        /* 다크 모드 */
+        body.dark-mode {
+            background-color: var(--dark);
+            color: var(--white);
+        }
+
+        body.dark-mode .navbar {
+            background-color: rgba(28, 28, 30, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .logo,
+        body.dark-mode .nav-link {
+            color: var(--white);
+        }
+
+        body.dark-mode .feature-card,
+        body.dark-mode .mod-card,
+        body.dark-mode .step,
+        body.dark-mode .requirement-card,
+        body.dark-mode .download-option {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .modpack,
+        body.dark-mode .requirements,
+        body.dark-mode footer {
+            background-color: rgba(36, 36, 38, 0.8);
+        }
+
+        body.dark-mode .feature-title,
+        body.dark-mode .mod-name,
+        body.dark-mode .step-title,
+        body.dark-mode .requirement-title,
+        body.dark-mode .requirement-label {
+            color: var(--white);
+        }
+
+        body.dark-mode .server-address {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        body.dark-mode .filter-btn {
+            background-color: rgba(44, 44, 46, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--gray-3);
+        }
+
+        body.dark-mode .toast {
+            background-color: var(--gray-5);
+            color: var(--dark);
+        }
+
+        body.dark-mode .social-icon {
+            background-color: rgba(44, 44, 46, 0.8);
+            color: var(--gray-3);
+        }
+
+        /* 애니메이션 */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+        }
+
+        /* 로더 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .double-bounce1, .double-bounce2 {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--primary);
+            opacity: 0.6;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: sk-bounce 2.0s infinite ease-in-out;
+        }
+
+        .double-bounce2 {
+            animation-delay: -1.0s;
+        }
+
+        @keyframes sk-bounce {
+            0%, 100% { 
+                transform: scale(0.0);
+            } 
+            50% { 
+                transform: scale(1.0);
+            }
+        }
+
+        /* 미디어 쿼리 */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                max-width: 550px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .step {
+                flex-direction: column;
+                padding: 24px;
+            }
+            
+            .step-number {
+                margin-bottom: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .modpack {
+                padding: 40px 20px;
+            }
+            
+            .download-options {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .server-address {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .requirements-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 햄버거 메뉴 */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--dark);
+            cursor: pointer;
+            transition: color var(--anim-speed-fast) ease;
+        }
+
+        body.dark-mode .menu-toggle {
+            color: var(--white);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--white);
+            z-index: 101;
+            box-shadow: var(--shadow-large);
+            transition: right var(--anim-speed-normal) ease;
+            display: flex;
+            flex-direction: column;
+            padding: 80px 30px 30px;
+        }
+
+        body.dark-mode .mobile-menu {
+            background-color: var(--dark);
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 1.5rem;
+            color: var(--dark);
+            cursor: pointer;
+            transition: color var(--anim-speed-fast) ease;
+        }
+
+        body.dark-mode .mobile-menu-close {
+            color: var(--white);
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mobile-nav-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color var(--anim-speed-fast) ease;
+        }
+
+        body.dark-mode .mobile-nav-link {
+            color: var(--white);
+        }
+
+        .mobile-nav-link:hover {
+            color: var(--primary);
+        }
+
+        .mobile-join-button {
+            margin-top: 30px;
+            padding: 12px 0;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--anim-speed-fast) ease;
+        }
+
+        .mobile-join-button:hover {
+            background-color: var(--secondary);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--anim-speed-normal) ease, visibility var(--anim-speed-normal) ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        /* 테마 토글 */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 99;
+            box-shadow: var(--shadow-medium);
+            transition: all var(--anim-speed-normal) ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- 로딩 화면 -->
+    <div class="loader">
+        <div class="spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+        </div>
+    </div>
+
+    <!-- 네비게이션 바 -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="logo">
+            <img src="./logo.png" alt="공블몬 로고" class="logo-image">
+            <span>공블몬</span>
+        </a>
+        <div class="nav-links">
+            <a href="#intro" class="nav-link">소개</a>
+            <a href="#features" class="nav-link">특징</a>
+            <a href="#mods" class="nav-link">모드</a>
+            <a href="#requirements" class="nav-link">시스템 요구사항</a>
+            <a href="#getting-started" class="nav-link">시작하기</a>
+        </div>
+        <button class="nav-join-button">서버 참여하기</button>
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- 모바일 메뉴 -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="mobile-menu-logo">
+            <img src="./logo.png" alt="공블몬 로고" class="mobile-logo-image">
+        </div>
+        <div class="mobile-nav-links">
+            <a href="#intro" class="mobile-nav-link">소개</a>
+            <a href="#features" class="mobile-nav-link">특징</a>
+            <a href="#mods" class="mobile-nav-link">모드</a>
+            <a href="#requirements" class="mobile-nav-link">시스템 요구사항</a>
+            <a href="#getting-started" class="mobile-nav-link">시작하기</a>
+        </div>
+        <button class="mobile-join-button">서버 참여하기</button>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 히어로 섹션 -->
+    <section class="hero">
+        <div class="hero-content">
+            <img src="./logo.png" alt="공블몬 로고" class="hero-logo">
+            <h1 class="hero-title">공블몬</h1>
+            <p class="hero-subtitle">포켓몬의 세계와 크리에이트 자동화의 완벽한 조화를 경험하세요. 최적화된 환경에서 한계 없는 모험이 여러분을 기다립니다.</p>
+            <div class="hero-actions">
+                <a href="#modpack" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    모드팩 다운로드
+                </a>
+                <a href="#getting-started" class="btn btn-secondary">
+                    <i class="fas fa-play"></i>
+                    시작하기
+                </a>
+            </div>
+            <div class="server-address-container">
+                <div class="server-address" id="serverAddress">
+                    <i class="fas fa-server"></i>
+                    vp.kro.kr
+                    <i class="fas fa-copy copy-icon"></i>
+                </div>
+            </div>
+            <div class="server-status">
+                <span class="status-dot"></span>
+                <span>현재 온라인 | 24/7 운영 중</span>
+            </div>
+        </div>
+        <div class="hero-image" role="img" aria-label="공블몬 서버 게임 스크린샷"></div>
+    </section>
+
+    <!-- 소개 섹션 -->
+    <section class="section" id="intro">
+        <div class="section-header">
+            <h2 class="section-title">서버 소개</h2>
+            <p class="section-description">공블몬 서버는 포켓몬의 세계관과 크리에이트 모드의 자동화 기능을 결합한 독특한 게임 경험을 제공합니다.</p>
+        </div>
+        <div class="intro-content">
+            <div class="intro-text">
+                <p>다양한 최적화 모드를 통해 부드러운 게임플레이를 즐기면서, 포켓몬을 수집하고 훈련시키고, 복잡한 자동화 기계를 설계하세요!</p>
+                <p>Cobblemon과 Create 모드의 조화로운 융합을 통해 창의력을 발휘하고 새로운 차원의 마인크래프트 경험을 누려보세요.</p>
+                <p>수많은 모드가 완벽하게 최적화되어 있어 원활한 게임 플레이를 보장합니다. 포켓몬 배틀과 자동화 시스템을 동시에 즐기면서 자신만의 스토리를 만들어보세요.</p>
+            </div>
+            <div class="intro-image-container">
+                <div class="intro-image">
+                    <img src="./intro-image1.png" alt="코블몬 포켓몬 트레이너">
+                </div>
+                <div class="intro-image">
+                    <img src="./intro-image2.png" alt="크리에이트 자동화 시스템">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .intro-content {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+            align-items: center;
+        }
+        
+        .intro-text {
+            flex: 1;
+            color: var(--gray-1);
+            line-height: 1.8;
+            animation: fadeUp 1.5s 0.2s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .intro-text p {
+            margin-bottom: 15px;
+        }
+        
+        .intro-image-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            animation: fadeUp 1.5s 0.4s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .intro-image {
+            border-radius: var(--radius-medium);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .intro-image:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-large), 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .intro-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all var(--anim-speed-normal) ease;
+        }
+        
+        .intro-image:hover img {
+            filter: brightness(1.1);
+        }
+        
+        @media (max-width: 992px) {
+            .intro-content {
+                flex-direction: column;
+            }
+            
+            .intro-image-container {
+                width: 100%;
+                max-width: 600px;
+                margin: 30px auto 0;
+            }
+        }
+    </style>
+
+    <!-- 특징 섹션 -->
+    <section class="section" id="features">
+        <div class="section-header">
+            <h2 class="section-title">주요 특징</h2>
+            <p class="section-description">공블몬 서버가 제공하는 특별한 경험을 알아보세요.</p>
+        </div>
+        <div class="features">
+            <div class="feature-card cobblemon">
+                <i class="fas fa-dragon feature-icon cobblemon"></i>
+                <h3 class="feature-title">Cobblemon 세계</h3>
+                <p class="feature-description">야생에서 다양한 포켓몬을 발견하고 수집하세요. 트레이너와 대결하고, 체육관 챌린지에 도전하며, 자신만의 포켓몬 마스터가 되어보세요!</p>
+                <img src="./feature-cobblemon.png" alt="코블몬 게임플레이" class="feature-image">
+                <a href="#mods" class="feature-more">더 알아보기 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card create">
+                <i class="fas fa-cogs feature-icon create"></i>
+                <h3 class="feature-title">Create 자동화</h3>
+                <p class="feature-description">기어, 벨트, 피스톤 등을 활용하여 복잡한 기계 시스템을 구축하세요. 자원 채취부터 가공까지 모든 과정을 자동화할 수 있습니다.</p>
+                <img src="./feature-create.png" alt="크리에이트 자동화 시스템" class="feature-image">
+                <a href="#mods" class="feature-more">더 알아보기 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card optimization">
+                <i class="fas fa-tachometer-alt feature-icon optimization"></i>
+                <h3 class="feature-title">최적화된 성능</h3>
+                <p class="feature-description">Sodium, Lithium, Starlight 등 다양한 최적화 모드를 통해 많은 모드가 설치되어 있어도 부드러운 게임플레이를 경험할 수 있습니다.</p>
+                <img src="./feature-optimization.png" alt="최적화 성능 그래프" class="feature-image">
+                <a href="#mods" class="feature-more">더 알아보기 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <style>
+            .feature-image {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                border-radius: var(--radius-medium);
+                margin: 10px 0 20px;
+                transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: var(--shadow-small);
+            }
+            
+            .feature-card:hover .feature-image {
+                transform: scale(1.05);
+                box-shadow: var(--shadow-medium);
+            }
+        </style>
+
+        <!-- 모드팩 다운로드 -->
+        <div class="modpack" id="modpack">
+            <h3 class="modpack-title">공블몬 모드팩 다운로드</h3>
+            <p class="modpack-description">간편하게 모드팩을 설치하고 바로 서버에 접속하세요. 모든 필수 모드가 이미 구성되어 있습니다.</p>
+            <div class="modpack-image-container">
+                <img src="./modpack-preview.png" alt="공블몬 모드팩 미리보기" class="modpack-image">
+            </div>
+            <div class="download-options">
+                <div class="download-option">
+                    <i class="fab fa-microsoft download-icon"></i>
+                    <div class="download-info">
+                        <!-- <a> 태그로 링크 감싸기 -->
+                        <a href="https://github.com/OCGK123/onlygays/releases/download/1.2.6/1.2.6.exe" target="_blank">
+                            <div class="download-label">Official Launcher</div>
+                            <div class="download-version">공블몬 모드팩 v1.2.6</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <style>
+            .modpack-image-container {
+                width: 100%;
+                max-width: 800px;
+                margin: 0 auto 30px;
+                border-radius: var(--radius-medium);
+                overflow: hidden;
+                box-shadow: var(--shadow-medium);
+                transition: all var(--anim-speed-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            
+            .modpack-image-container:hover {
+                transform: scale(1.02);
+                box-shadow: var(--shadow-large), 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+            
+            .modpack-image {
+                width: 100%;
+                height: auto;
+                display: block;
+                transition: all var(--anim-speed-normal) ease;
+            }
+            
+            .modpack-image-container:hover .modpack-image {
+                filter: brightness(1.05);
+            }
+        </style>
+    </section>
+
+    <!-- 모드 목록 섹션 -->
+    <section class="section" id="mods">
+        <div class="section-header">
+            <h2 class="section-title">설치된 모드</h2>
+            <p class="section-description">공블몬에 설치된 모든 모드의 목록입니다. 카테고리별로 필터링하여 살펴보세요.</p>
+        </div>
+        <div class="mods-filter">
+            <button class="filter-btn active" data-filter="all">전체</button>
+            <button class="filter-btn cobblemon" data-filter="cobblemon">Cobblemon</button>
+            <button class="filter-btn create" data-filter="create">Create</button>
+            <button class="filter-btn optimization" data-filter="optimization">최적화</button>
+            <button class="filter-btn" data-filter="gameplay">게임플레이</button>
+            <button class="filter-btn" data-filter="visual">시각적 개선</button>
+            <button class="filter-btn" data-filter="utility">유틸리티</button>
+        </div>
+        <div class="mods-list" id="modsList">
+            <!-- 자바스크립트로 모드 목록이 여기에 생성됩니다 -->
+        </div>
+
+        <!-- 시스템 요구사항 -->
+        <div class="requirements" id="requirements">
+            <h3 class="requirements-title">시스템 요구사항</h3>
+            <div class="requirements-grid">
+                <div class="requirement-card">
+                    <div class="requirement-header">
+                        <i class="fas fa-microchip requirement-icon"></i>
+                        <h4 class="requirement-title">최소 사양</h4>
+                    </div>
+                    <ul class="requirement-list">
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">CPU:</span>
+                                <span class="requirement-value">Intel Core i3-3210 / AMD A8-7600 이상</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">RAM:</span>
+                                <span class="requirement-value">8GB (최소 4GB 할당)</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">그래픽:</span>
+                                <span class="requirement-value">내장 그래픽 (최소 1GB VRAM)</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">저장공간:</span>
+                                <span class="requirement-value">5GB 여유 공간</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">인터넷:</span>
+                                <span class="requirement-value">안정적인 브로드밴드 연결</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <div class="requirement-header">
+                        <i class="fas fa-rocket requirement-icon"></i>
+                        <h4 class="requirement-title">권장 사양</h4>
+                    </div>
+                    <ul class="requirement-list">
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">CPU:</span>
+                                <span class="requirement-value">Intel Core i5-6600K / AMD Ryzen 5 1600 이상</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">RAM:</span>
+                                <span class="requirement-value">16GB (최소 6GB 할당)</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">그래픽:</span>
+                                <span class="requirement-value">NVIDIA GeForce GTX 1050 / AMD Radeon RX 560 이상</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">저장공간:</span>
+                                <span class="requirement-value">SSD 10GB 여유 공간</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">인터넷:</span>
+                                <span class="requirement-value">10Mbps 이상 안정적인 연결</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <div class="requirement-header">
+                        <i class="fas fa-cog requirement-icon"></i>
+                        <h4 class="requirement-title">Java 요구사항</h4>
+                    </div>
+                    <ul class="requirement-list">
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">Java 버전:</span>
+                                <span class="requirement-value">Java 17 이상</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">JVM 인수:</span>
+                                <span class="requirement-value">권장 JVM 인수 사용 (모드팩에 포함)</span>
+                            </div>
+                        </li>
+                        <li class="requirement-item">
+                            <i class="fas fa-check"></i>
+                            <div>
+                                <span class="requirement-label">모드로더:</span>
+                                <span class="requirement-value">Fabric 0.15.0 이상</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 시작하기 섹션 -->
+    <section class="section" id="getting-started">
+        <div class="section-header">
+            <h2 class="section-title">시작하기</h2>
+            <p class="section-description">공블몬에 접속하는 방법을 알아보세요. 몇 가지 간단한 단계를 따라 빠르게 시작할 수 있습니다.</p>
+        </div>
+        <div class="getting-started">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3 class="step-title">모드팩 다운로드</h3>
+                    <p class="step-description">위의 '모드팩 다운로드' 섹션에서 공블몬 모드팩을 다운로드하세요. 이미 필요한 모든 모드가 설치되어 있습니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3 class="step-title">모드팩 설치</h3>
+                    <p class="step-description">모드팩 프로그램을 켠 후 , 모드팩 설치 버튼을 누르세요. 나머지는 모드팩 설치 프로그램이 모두 해줄거에요! (오류시 디스코드로 문의 부탁드립니다)</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3 class="step-title">Java 설정 확인</h3>
+                    <p class="step-description">마인크래프트가 Java 17 이상을 사용하도록 설정되어 있는지 확인하세요. 또한 RAM 할당을 최소 6GB 이상으로 설정하는 것이 권장됩니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3 class="step-title">서버 접속</h3>
+                    <p class="step-description">마인크래프트를 실행하고 멀티플레이어에서 공블몬 공식 서버를 클릭하여 접속하세요!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 알림 토스트 -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">서버 주소가 클립보드에 복사되었습니다!</span>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="./logo.png" alt="공블몬 로고" class="footer-logo-image" style="height: 50px; width: auto;">
+                <span>공블몬</span>
+            </div>
+            <div class="footer-navigation">
+                <a href="#intro" class="footer-link">소개</a>
+                <a href="#features" class="footer-link">특징</a>
+                <a href="#mods" class="footer-link">모드</a>
+                <a href="#requirements" class="footer-link">시스템 요구사항</a>
+                <a href="#getting-started" class="footer-link">시작하기</a>
+            </div>
+            <div class="footer-social">
+                <a href="https://discord.gg/p78P9xnfNj" class="social-icon"><i class="fab fa-discord"></i></a>
+                <a href="https://github.com/OCGK123" class="social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://www.youtube.com/@Ocgk123" class="social-icon"><i class="fab fa-youtube"></i></a>
+            </div>
+            <div class="footer-legal">
+                <p>공블몬 마인크래프트 서버 &copy; 2025 | 서버 주소: vp.kro.kr</p>
+                <p>이 웹사이트는 Mojang AB와 관련이 없으며 공식 마인크래프트 제품이 아닙니다.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 테마 토글 -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <script>
+        // 모드 데이터
+        const modsData = [
+            // Cobblemon 관련 모드
+            { name: "Cobblemon", category: "cobblemon", description: "포켓몬을 마인크래프트에 추가하는 코어 모드" },
+            { name: "CobblemonExtras", category: "cobblemon", description: "Cobblemon에 추가 기능을 제공" },
+            { name: "Cobblemon Trainers", category: "cobblemon", description: "NPC 트레이너를 추가" },
+            { name: "Create-Cobblemon", category: "cobblemon", description: "Create 모드와 Cobblemon의 통합" },
+            { name: "Cobblemon Spawn Notification", category: "cobblemon", description: "희귀 포켓몬 출현 알림 제공" },
+            { name: "Cobblemon Legendary Structures", category: "cobblemon", description: "전설의 포켓몬이 출현하는 구조물 추가" },
+            { name: "Cobblemon Riding", category: "cobblemon", description: "포켓몬을 타고 이동할 수 있는 기능 추가" },
+            { name: "Cobblemon Captures", category: "cobblemon", description: "포켓몬 캡처 경험치 시스템" },
+            { name: "Cobgyms", category: "cobblemon", description: "체육관 시스템 추가" },
+            { name: "Cobblenav", category: "cobblemon", description: "포켓몬 관련 내비게이션 시스템" },
+            { name: "Cobblepedia", category: "cobblemon", description: "포켓몬 정보 도감 시스템" },
+            
+            // Create 관련 모드
+            { name: "Create", category: "create", description: "자동화 기계와 공학 시스템을 추가하는 모드" },
+            { name: "Create Addition", category: "create", description: "Create 모드의 확장팩" },
+            { name: "Create Diesel Generators", category: "create", description: "디젤 발전기 추가" },
+            { name: "Create Slugma", category: "create", description: "Create에 추가 내용물 제공" },
+            { name: "Extended Gears", category: "create", description: "다양한 기어 추가" },
+            { name: "Goggle Trinket Slot", category: "create", description: "엔지니어 고글 장착 슬롯 추가" },
+            { name: "Create Man of Many Planes", category: "create", description: "비행체 시스템 확장" },
+            
+            // 최적화 모드
+            { name: "Sodium", category: "optimization", description: "렌더링 시스템 최적화" },
+            { name: "Lithium", category: "optimization", description: "게임 물리 및 로직 최적화" },
+            { name: "Starlight", category: "optimization", description: "조명 엔진 완전 재작성으로 성능 향상" },
+            { name: "FerriteCore", category: "optimization", description: "메모리 사용량 최적화" },
+            { name: "LazyDFU", category: "optimization", description: "게임 시작 시간 단축" },
+            { name: "EntityCulling", category: "optimization", description: "보이지 않는 엔티티 렌더링 최적화" },
+            { name: "Memory Leak Fix", category: "optimization", description: "메모리 누수 문제 해결" },
+            { name: "ModernFix", category: "optimization", description: "다양한 성능 개선" },
+            { name: "MoreCulling", category: "optimization", description: "추가 컬링 최적화" },
+            { name: "Krypton", category: "optimization", description: "네트워크 스택 최적화" },
+            { name: "ImmediatelyFast", category: "optimization", description: "즉시 모드 렌더링 최적화" },
+            { name: "Dynamic FPS", category: "optimization", description: "비활성 상태일 때 FPS 제한" },
+            { name: "C2ME", category: "optimization", description: "청크 관리 및 생성 최적화" },
+            { name: "Alternate Current", category: "optimization", description: "레드스톤 최적화" },
+            { name: "Indium", category: "optimization", description: "Sodium과 호환되는 렌더링 API" },
+            
+            // 게임플레이 개선
+            { name: "Waystones", category: "gameplay", description: "텔레포트 웨이포인트 시스템" },
+            { name: "Better Combat", category: "gameplay", description: "전투 시스템 개선" },
+            { name: "Open Parties and Claims", category: "gameplay", description: "땅 청구 및 파티 시스템" },
+            { name: "Trinkets", category: "gameplay", description: "추가 장비 슬롯" },
+            { name: "Advancement Plaques", category: "gameplay", description: "발전과제 UI 개선" },
+            { name: "Towns and Towers", category: "gameplay", description: "새로운 구조물 생성" },
+            { name: "Dungeons Arise", category: "gameplay", description: "복잡한 던전 구조물 추가" },
+            { name: "Myths and Legends", category: "gameplay", description: "신화적 요소 추가" },
+            
+            // 시각적 개선
+            { name: "Continuity", category: "visual", description: "연결 텍스처 지원" },
+            { name: "Falling Leaves", category: "visual", description: "나뭇잎 떨어지는 효과" },
+            { name: "LambDynamicLights", category: "visual", description: "동적 조명 시스템" },
+            { name: "Iris", category: "visual", description: "셰이더 지원" },
+            { name: "NotEnoughAnimations", category: "visual", description: "캐릭터 애니메이션 개선" },
+            { name: "SkinLayers3D", category: "visual", description: "스킨 레이어 3D 표현" },
+            { name: "Enhanced Block Entities", category: "visual", description: "블록 엔티티 렌더링 개선" },
+            { name: "Sound Physics Remastered", category: "visual", description: "사실적인 사운드 물리학" },
+            
+            // 유틸리티
+            { name: "JEI", category: "utility", description: "아이템 레시피 정보 제공" },
+            { name: "Xaero's Minimap", category: "utility", description: "미니맵 시스템" },
+            { name: "Xaero's World Map", category: "utility", description: "월드맵 시스템" },
+            { name: "Jade", category: "utility", description: "블록 및 엔티티 정보 표시" },
+            { name: "Mouse Tweaks", category: "utility", description: "마우스 기능 개선" },
+            { name: "Better F3", category: "utility", description: "F3 디버그 화면 개선" },
+            { name: "Modmenu", category: "utility", description: "모드 관리 메뉴" },
+            { name: "TPS HUD", category: "utility", description: "서버 TPS 표시" },
+            { name: "AppleSkin", category: "utility", description: "식품 및 허기 정보 개선" },
+            { name: "Better Third Person", category: "utility", description: "3인칭 시점 개선" }
+        ];
+
+        // DOM 요소
+        const modsList = document.getElementById('modsList');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const serverAddress = document.getElementById('serverAddress');
+        const toast = document.getElementById('toast');
+        const themeToggle = document.getElementById('themeToggle');
+        const sections = document.querySelectorAll('.section');
+        const loader = document.querySelector('.loader');
+        const navbar = document.getElementById('navbar');
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const overlay = document.getElementById('overlay');
+        const downloadOptions = document.querySelectorAll('.download-option');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        const navJoinButton = document.querySelector('.nav-join-button');
+        const mobileJoinButton = document.querySelector('.mobile-join-button');
+
+        // 모드 목록 생성 함수
+        function renderMods(filter = 'all') {
+            modsList.innerHTML = '';
+            
+            modsData.forEach(mod => {
+                if (filter === 'all' || mod.category === filter) {
+                    const modCard = document.createElement('div');
+                    modCard.className = 'mod-card';
+                    
+                    const modHtml = `
+                        <h3 class="mod-name">${mod.name}</h3>
+                        <span class="mod-category ${mod.category}">${getCategoryName(mod.category)}</span>
+                        <p class="mod-description">${mod.description}</p>
+                    `;
+                    
+                    modCard.innerHTML = modHtml;
+                    modsList.appendChild(modCard);
+                }
+            });
+        }
+
+        // 카테고리 이름 변환 함수
+        function getCategoryName(category) {
+            const categoryNames = {
+                'cobblemon': '코블몬',
+                'create': '크리에이트',
+                'optimization': '최적화',
+                'gameplay': '게임플레이',
+                'visual': '시각적',
+                'utility': '유틸리티'
+            };
+            
+            return categoryNames[category] || category;
+        }
+
+        // 토스트 메시지 표시 함수
+        function showToast(message) {
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 초기 모드 목록 렌더링
+        renderMods();
+
+        // 필터 버튼 이벤트 리스너
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 활성화된 버튼 클래스 제거
+                filterButtons.forEach(b => b.classList.remove('active'));
+                
+                // 현재 버튼 활성화
+                btn.classList.add('active');
+                
+                // 필터링 적용
+                renderMods(btn.dataset.filter);
+            });
+        });
+
+        // 서버 주소 복사 기능
+        serverAddress.addEventListener('click', () => {
+            navigator.clipboard.writeText('vp.kro.kr').then(() => {
+                showToast('서버 주소가 클립보드에 복사되었습니다!');
+            });
+        });
+
+        // 모드팩 다운로드 기능
+        downloadOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                showToast('모드팩 다운로드가 시작됩니다!');
+                // 실제 다운로드 로직은 여기에 추가
+            });
+        });
+
+        // 다크 모드 토글
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            // 아이콘 변경
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+
+        // 스크롤 애니메이션
+        function checkScroll() {
+            // 네비게이션 바 스크롤 효과
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+            
+            // 섹션 애니메이션
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const sectionBottom = section.getBoundingClientRect().bottom;
+                const windowHeight = window.innerHeight;
+                
+                if (sectionTop < windowHeight * 0.75 && sectionBottom > 0) {
+                    section.classList.add('visible');
+                }
+            });
+        }
+
+        // 모바일 메뉴 토글
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeMenu() {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuClose.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
+        
+        // 모바일 메뉴 내비게이션 링크
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeMenu();
+            });
+        });
+
+        // 서버 참여 버튼
+        navJoinButton.addEventListener('click', () => {
+            navigator.clipboard.writeText('vp.kro.kr').then(() => {
+                showToast('서버 주소가 클립보드에 복사되었습니다! 마인크래프트를 실행하여 접속하세요.');
+            });
+        });
+
+        mobileJoinButton.addEventListener('click', () => {
+            navigator.clipboard.writeText('vp.kro.kr').then(() => {
+                showToast('서버 주소가 클립보드에 복사되었습니다! 마인크래프트를 실행하여 접속하세요.');
+                closeMenu();
+            });
+        });
+
+        // 부드러운 스크롤 기능
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 초기 로딩
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                // 초기 스크롤 체크
+                checkScroll();
+            }, 1000);
+        });
+
+        // 스크롤 이벤트 리스너
+        window.addEventListener('scroll', checkScroll);
+    </script>
+</body>
+</html>
